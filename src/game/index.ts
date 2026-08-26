@@ -6,6 +6,7 @@ export { resolveSkirmish, resolveBossEncounter } from './combat.js';
 export type { BattleOutcome, BossEncounterOutcome } from './combat.js';
 export { resolveNodeArrival } from './nodeEffects.js';
 export type { NodeEffectResult } from './nodeEffects.js';
+export { formatGameStatus, formatMoveOptions, formatTurnEvents } from './renderGame.js';
 export {
   FACTION_IDS,
   DEFAULT_STARTING_POWER,

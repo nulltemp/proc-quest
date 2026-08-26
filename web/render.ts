@@ -14,9 +14,15 @@ function svgEl<K extends keyof SVGElementTagNameMap>(tag: K): SVGElementTagNameM
   return document.createElementNS(SVG_NS, tag);
 }
 
-export function renderMapToSvg(map: GeneratedMap): SVGSVGElement {
+export interface MapHighlights {
+  currentNodeId?: number;
+  reachableNodeIds?: number[];
+}
+
+export function renderMapToSvg(map: GeneratedMap, highlights: MapHighlights = {}): SVGSVGElement {
   const { nodes, edges, config } = map;
   const nodesById = new Map(nodes.map((n) => [n.id, n]));
+  const reachable = new Set(highlights.reachableNodeIds ?? []);
 
   const toSvgX = (x: number) => x;
   const toSvgY = (y: number) => config.height - y;
@@ -67,7 +73,10 @@ export function renderMapToSvg(map: GeneratedMap): SVGSVGElement {
     }
 
     const circle = svgEl('circle');
-    circle.setAttribute('class', `node node-${node.type}`);
+    const classes = ['node', `node-${node.type}`];
+    if (node.id === highlights.currentNodeId) classes.push('node-current');
+    else if (reachable.has(node.id)) classes.push('node-reachable');
+    circle.setAttribute('class', classes.join(' '));
     circle.setAttribute('data-id', String(node.id));
     circle.setAttribute('data-type', node.type);
     circle.setAttribute('cx', String(cx));
