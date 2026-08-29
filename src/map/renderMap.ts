@@ -1,7 +1,14 @@
 import type { GeneratedMap } from './generateMap.js';
 import type { NodeType } from './nodeTypes.js';
 
-const NODE_MARKERS: Record<NodeType, string> = { start: 'S', boss: 'B', battle: '!', event: '?', normal: 'o' };
+const NODE_MARKERS: Record<NodeType, string> = {
+  start: 'S',
+  boss: 'B',
+  battle: '!',
+  event: '?',
+  normal: 'o',
+  treasure: '$',
+};
 
 export function formatMapAsText(map: GeneratedMap): string {
   const { nodes, edges, startNodeId, bossNodeId, config } = map;

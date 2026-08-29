@@ -107,6 +107,10 @@ main {
   fill: #999;
 }
 
+.node-treasure {
+  fill: #d4af37;
+}
+
 .legend {
   list-style: none;
   padding: 0;
@@ -135,6 +139,7 @@ main {
 .swatch.node-battle { background: #e08a1e; }
 .swatch.node-event { background: #6a5acd; }
 .swatch.node-normal { background: #999; }
+.swatch.node-treasure { background: #d4af37; }
 
 #status-panel {
   white-space: pre-line;

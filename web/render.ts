@@ -8,6 +8,7 @@ const NODE_RADIUS: Record<string, number> = {
   battle: 2,
   event: 2,
   normal: 1.5,
+  treasure: 2,
 };
 
 function svgEl<K extends keyof SVGElementTagNameMap>(tag: K): SVGElementTagNameMap[K] {
