@@ -16,11 +16,13 @@ export function createInitialState(map: GeneratedMap, options: CreateGameOptions
         id: FACTION_IDS.PLAYER,
         power: options.playerStartingPower ?? DEFAULT_STARTING_POWER,
         activeEffects: [],
+        inventory: {},
       },
       [FACTION_IDS.ENEMY]: {
         id: FACTION_IDS.ENEMY,
         power: options.enemyStartingPower ?? DEFAULT_STARTING_POWER,
         activeEffects: [],
+        inventory: {},
       },
     },
     turnNumber: 0,

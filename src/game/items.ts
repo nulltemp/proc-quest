@@ -25,22 +25,43 @@ export function pickItem(rng: () => number): ItemType {
 export interface ItemPickupResult {
   player: FactionState;
   itemType: ItemType;
+}
+
+export function pickUpItem(rng: () => number, player: FactionState): ItemPickupResult {
+  const itemType = pickItem(rng);
+  const inventory = { ...player.inventory, [itemType]: (player.inventory[itemType] ?? 0) + 1 };
+  return { player: { ...player, inventory }, itemType };
+}
+
+export interface UseItemResult {
+  player: FactionState;
+  success: boolean;
   powerDelta?: number;
 }
 
-export function applyItemPickup(rng: () => number, player: FactionState): ItemPickupResult {
-  const itemType = pickItem(rng);
+export function useItem(itemType: ItemType, rng: () => number, player: FactionState): UseItemResult {
+  const held = player.inventory[itemType] ?? 0;
+  if (held <= 0) {
+    return { player, success: false };
+  }
+
+  const inventory = { ...player.inventory, [itemType]: held - 1 };
+  const withUpdatedInventory: FactionState = { ...player, inventory };
 
   if (itemType === 'powerTonic') {
     const [min, max] = POWER_TONIC_RANGE;
     const powerDelta = randomInt(rng, min, max);
-    return { player: { ...player, power: player.power + powerDelta }, itemType, powerDelta };
+    return {
+      player: { ...withUpdatedInventory, power: withUpdatedInventory.power + powerDelta },
+      success: true,
+      powerDelta,
+    };
   }
 
   const shield: ActiveEffect = { type: 'shield', charges: GUARDIAN_WARD_CHARGES };
   return {
-    player: { ...player, activeEffects: [...player.activeEffects, shield] },
-    itemType,
+    player: { ...withUpdatedInventory, activeEffects: [...withUpdatedInventory.activeEffects, shield] },
+    success: true,
   };
 }
 

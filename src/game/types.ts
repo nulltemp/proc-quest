@@ -11,13 +11,19 @@ export interface FactionState {
   id: FactionId;
   power: number;
   activeEffects: ActiveEffect[];
+  inventory: Inventory;
 }
 
 export type ItemType = 'powerTonic' | 'guardianWard';
 
+export type Inventory = Partial<Record<ItemType, number>>;
+
 export type GameStatus = 'ongoing' | 'won' | 'lost';
 
-export type GameCommand = { type: 'move'; targetNodeId: number };
+export type GameCommand =
+  | { type: 'move'; targetNodeId: number }
+  | { type: 'useItem'; itemType: ItemType }
+  | { type: 'rest' };
 
 export type TurnEvent =
   | { kind: 'moved'; fromNodeId: number; toNodeId: number }
@@ -27,8 +33,12 @@ export type TurnEvent =
   | { kind: 'bossCounterattack'; nodeId: number; damage: number }
   | { kind: 'event'; nodeId: number; powerDelta: number }
   | { kind: 'attrition'; powerDelta: number }
-  | { kind: 'itemAcquired'; nodeId: number; itemType: ItemType; powerDelta?: number }
-  | { kind: 'itemEffectTriggered'; nodeId: number; itemType: ItemType; damageBlocked: number };
+  | { kind: 'enemyGrowth'; powerDelta: number }
+  | { kind: 'itemAcquired'; nodeId: number; itemType: ItemType }
+  | { kind: 'itemEffectTriggered'; nodeId: number; itemType: ItemType; damageBlocked: number }
+  | { kind: 'itemUsed'; itemType: ItemType; powerDelta?: number }
+  | { kind: 'itemUseFailed'; itemType: ItemType }
+  | { kind: 'rested'; powerDelta: number };
 
 export interface GameState {
   currentNodeId: number;

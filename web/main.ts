@@ -9,7 +9,7 @@ import {
   formatMoveOptions,
   formatTurnEvents,
 } from '../src/game/index.js';
-import type { GameState, GameCommand } from '../src/game/index.js';
+import type { GameState, GameCommand, ItemType } from '../src/game/index.js';
 
 const mapContainer = document.querySelector<HTMLDivElement>('#map-container')!;
 const legend = document.querySelector<HTMLUListElement>('#legend')!;
@@ -19,6 +19,7 @@ const regenerateBtn = document.querySelector<HTMLButtonElement>('#regenerate-btn
 const randomBtn = document.querySelector<HTMLButtonElement>('#random-btn')!;
 const banner = document.querySelector<HTMLDivElement>('#banner')!;
 const statusPanel = document.querySelector<HTMLDivElement>('#status-panel')!;
+const actionsPanel = document.querySelector<HTMLDivElement>('#actions-panel')!;
 const logPanel = document.querySelector<HTMLUListElement>('#log-panel')!;
 
 let map: GeneratedMap;
@@ -75,6 +76,36 @@ function renderGame(): void {
     banner.className = 'visible banner-lost';
     banner.textContent = 'Your faction has been depleted. Game over.';
   }
+
+  renderActions();
+}
+
+function runCommand(command: GameCommand): void {
+  if (gameState.status !== 'ongoing') return;
+  gameState = advanceTurn(map, gameState, command);
+  renderGame();
+}
+
+function renderActions(): void {
+  actionsPanel.replaceChildren();
+  if (gameState.status !== 'ongoing') return;
+
+  const restBtn = document.createElement('button');
+  restBtn.type = 'button';
+  restBtn.textContent = 'Rest';
+  restBtn.addEventListener('click', () => runCommand({ type: 'rest' }));
+  actionsPanel.appendChild(restBtn);
+
+  for (const [itemType, count] of Object.entries(gameState.factions.player.inventory)) {
+    if (!count) continue;
+    const useBtn = document.createElement('button');
+    useBtn.type = 'button';
+    useBtn.textContent = `Use ${itemType} (${count})`;
+    useBtn.addEventListener('click', () =>
+      runCommand({ type: 'useItem', itemType: itemType as ItemType }),
+    );
+    actionsPanel.appendChild(useBtn);
+  }
 }
 
 regenerateBtn.addEventListener('click', () => {
@@ -93,9 +124,7 @@ mapContainer.addEventListener('click', (event) => {
   const targetNodeId = Number(target.getAttribute('data-id'));
   if (!Number.isInteger(targetNodeId)) return;
 
-  const command: GameCommand = { type: 'move', targetNodeId };
-  gameState = advanceTurn(map, gameState, command);
-  renderGame();
+  runCommand({ type: 'move', targetNodeId });
 });
 
 const initialSeedParam = new URLSearchParams(location.search).get('seed');

@@ -147,6 +147,19 @@ main {
   margin-bottom: 0.75rem;
 }
 
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.actions button {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+
 #log-panel {
   list-style: none;
   padding: 0.5rem;

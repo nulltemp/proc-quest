@@ -12,6 +12,13 @@ export function formatGameStatus(map: GeneratedMap, state: GameState): string {
   if (effects.length > 0) {
     lines.push(`Active effects: ${formatActiveEffects(effects)}`);
   }
+  const inventory = state.factions.player.inventory;
+  const heldItems = Object.entries(inventory).filter(([, count]) => (count ?? 0) > 0);
+  lines.push(
+    heldItems.length > 0
+      ? `Inventory: ${heldItems.map(([type, count]) => `${type} x${count}`).join(', ')}`
+      : 'Inventory: (empty)',
+  );
   return lines.join('\n');
 }
 
@@ -49,9 +56,17 @@ function formatEvent(event: TurnEvent): string {
       return `  Event: power ${event.powerDelta >= 0 ? '+' : ''}${event.powerDelta}.`;
     case 'attrition':
       return `  Attrition: ${event.powerDelta} power.`;
+    case 'enemyGrowth':
+      return `  The enemy grows stronger: +${event.powerDelta} power.`;
     case 'itemAcquired':
-      return `  Found a ${event.itemType}!${event.powerDelta !== undefined ? ` (+${event.powerDelta} power)` : ''}`;
+      return `  Found a ${event.itemType}! (added to inventory)`;
     case 'itemEffectTriggered':
       return `  Your ${event.itemType} absorbed ${event.damageBlocked} damage!`;
+    case 'itemUsed':
+      return `  Used ${event.itemType}.${event.powerDelta !== undefined ? ` (+${event.powerDelta} power)` : ' (shield raised)'}`;
+    case 'itemUseFailed':
+      return `  You don't have a ${event.itemType} to use.`;
+    case 'rested':
+      return `  Rested: +${event.powerDelta} power.`;
   }
 }
