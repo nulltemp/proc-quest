@@ -9,13 +9,18 @@
 <body>
   <div id="app">
     <header>
-      <h1>proc-quest map viewer</h1>
+      <h1 id="app-title">proc-quest map viewer</h1>
       <div class="controls">
-        <label for="seed-input">Seed</label>
+        <label id="seed-label" for="seed-input">Seed</label>
         <input id="seed-input" type="number" step="1" />
         <button id="regenerate-btn" type="button">Regenerate</button>
         <button id="random-btn" type="button">Random seed</button>
         <span id="seed-display"></span>
+        <label id="lang-label" for="lang-select">Language</label>
+        <select id="lang-select">
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+        </select>
       </div>
     </header>
     <div id="banner" role="status"></div>
@@ -23,7 +28,7 @@
       <div id="map-container"></div>
       <aside id="game-panel">
         <div id="status-panel"></div>
-        <h2>Log</h2>
+        <h2 id="log-heading">Log</h2>
         <ul id="log-panel"></ul>
       </aside>
       <ul id="legend" class="legend"></ul>

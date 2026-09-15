@@ -1,4 +1,5 @@
 import type { GeneratedMap } from '../src/map/index.js';
+import { DEFAULT_LOCALE, getMessages, type Locale } from '../src/i18n/index.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -20,7 +21,12 @@ export interface MapHighlights {
   reachableNodeIds?: number[];
 }
 
-export function renderMapToSvg(map: GeneratedMap, highlights: MapHighlights = {}): SVGSVGElement {
+export function renderMapToSvg(
+  map: GeneratedMap,
+  highlights: MapHighlights = {},
+  locale: Locale = DEFAULT_LOCALE,
+): SVGSVGElement {
+  const t = getMessages(locale);
   const { nodes, edges, config } = map;
   const nodesById = new Map(nodes.map((n) => [n.id, n]));
   const reachable = new Set(highlights.reachableNodeIds ?? []);
@@ -85,7 +91,7 @@ export function renderMapToSvg(map: GeneratedMap, highlights: MapHighlights = {}
     circle.setAttribute('r', String(radius));
 
     const title = svgEl('title');
-    title.textContent = `#${node.id} ${node.type} (${node.x.toFixed(2)}, ${node.y.toFixed(2)})`;
+    title.textContent = `#${node.id} ${t.nodeType[node.type]} (${node.x.toFixed(2)}, ${node.y.toFixed(2)})`;
     circle.appendChild(title);
 
     nodesGroup.appendChild(circle);

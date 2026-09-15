@@ -1,5 +1,6 @@
 import type { GeneratedMap } from './generateMap.js';
 import type { NodeType } from './nodeTypes.js';
+import { DEFAULT_LOCALE, getMessages, type Locale } from '../i18n/index.js';
 
 const NODE_MARKERS: Record<NodeType, string> = {
   start: 'S',
@@ -10,23 +11,24 @@ const NODE_MARKERS: Record<NodeType, string> = {
   treasure: '$',
 };
 
-export function formatMapAsText(map: GeneratedMap): string {
+export function formatMapAsText(map: GeneratedMap, locale: Locale = DEFAULT_LOCALE): string {
   const { nodes, edges, startNodeId, bossNodeId, config } = map;
+  const t = getMessages(locale);
   const lines: string[] = [];
 
-  lines.push(`Seed: ${config.seed}`);
-  lines.push(`Nodes (${nodes.length}):`);
+  lines.push(t.map.seed(config.seed));
+  lines.push(t.map.nodesHeader(nodes.length));
   for (const node of nodes) {
     const idLabel = String(node.id).padStart(2, ' ');
-    lines.push(`  [${idLabel}] (${node.x.toFixed(2)}, ${node.y.toFixed(2)}) ${node.type}`);
+    lines.push(`  [${idLabel}] (${node.x.toFixed(2)}, ${node.y.toFixed(2)}) ${t.nodeType[node.type]}`);
   }
 
-  lines.push(`Edges (${edges.length}):`);
+  lines.push(t.map.edgesHeader(edges.length));
   for (const edge of edges) {
     lines.push(`  ${edge.from} -- ${edge.to}  (weight ${edge.weight.toFixed(2)})`);
   }
 
-  lines.push(`Start: node ${startNodeId}   Boss: node ${bossNodeId}`);
+  lines.push(t.map.startBoss(startNodeId, bossNodeId));
 
   return lines.join('\n');
 }
