@@ -1,72 +1,89 @@
 import type { GeneratedMap } from '../map/index.js';
 import { getAdjacentNodeIds } from './movement.js';
 import type { GameState, TurnEvent } from './types.js';
+import { DEFAULT_LOCALE, getMessages, type Locale } from '../i18n/index.js';
 
-export function formatGameStatus(map: GeneratedMap, state: GameState): string {
+export function formatGameStatus(map: GeneratedMap, state: GameState, locale: Locale = DEFAULT_LOCALE): string {
+  const t = getMessages(locale);
   const node = map.nodes.find((n) => n.id === state.currentNodeId);
+  const nodeTypeLabel = node ? t.nodeType[node.type] : t.game.unknownNodeType;
   const lines = [
-    `Turn ${state.turnNumber} — at node ${state.currentNodeId} (${node?.type ?? 'unknown'})`,
-    `Player power: ${state.factions.player.power}  |  Enemy power: ${state.factions.enemy.power}`,
+    t.game.turnStatus(state.turnNumber, state.currentNodeId, nodeTypeLabel),
+    t.game.power(state.factions.player.power, state.factions.enemy.power),
   ];
   const effects = state.factions.player.activeEffects;
   if (effects.length > 0) {
-    lines.push(`Active effects: ${formatActiveEffects(effects)}`);
+    lines.push(t.game.activeEffects(formatActiveEffects(effects, locale)));
   }
   const inventory = state.factions.player.inventory;
   const heldItems = Object.entries(inventory).filter(([, count]) => (count ?? 0) > 0);
   lines.push(
     heldItems.length > 0
-      ? `Inventory: ${heldItems.map(([type, count]) => `${type} x${count}`).join(', ')}`
-      : 'Inventory: (empty)',
+      ? t.game.inventory(
+          heldItems
+            .map(([type, count]) => `${t.itemType[type as keyof typeof t.itemType]} x${count}`)
+            .join(', '),
+        )
+      : t.game.inventoryEmpty,
   );
   return lines.join('\n');
 }
 
-function formatActiveEffects(effects: GameState['factions']['player']['activeEffects']): string {
+function formatActiveEffects(
+  effects: GameState['factions']['player']['activeEffects'],
+  locale: Locale,
+): string {
+  const t = getMessages(locale);
   const counts = new Map<string, number>();
   for (const effect of effects) {
     counts.set(effect.type, (counts.get(effect.type) ?? 0) + 1);
   }
-  return [...counts.entries()].map(([type, count]) => `${type} x${count}`).join(', ');
+  return [...counts.entries()].map(([type, count]) => `${t.effectType[type as keyof typeof t.effectType]} x${count}`).join(', ');
 }
 
-export function formatMoveOptions(map: GeneratedMap, nodeId: number): string {
+export function formatMoveOptions(map: GeneratedMap, nodeId: number, locale: Locale = DEFAULT_LOCALE): string {
+  const t = getMessages(locale);
   return getAdjacentNodeIds(map, nodeId)
-    .map((id) => `${id}(${map.nodes.find((n) => n.id === id)?.type ?? '?'})`)
+    .map((id) => {
+      const node = map.nodes.find((n) => n.id === id);
+      const typeLabel = node ? t.nodeType[node.type] : t.game.unknownNodeType;
+      return `${id}(${typeLabel})`;
+    })
     .join(', ');
 }
 
-export function formatTurnEvents(events: TurnEvent[]): string {
-  return events.map(formatEvent).join('\n');
+export function formatTurnEvents(events: TurnEvent[], locale: Locale = DEFAULT_LOCALE): string {
+  const t = getMessages(locale);
+  return events.map((event) => formatEvent(event, t)).join('\n');
 }
 
-function formatEvent(event: TurnEvent): string {
+function formatEvent(event: TurnEvent, t: ReturnType<typeof getMessages>): string {
   switch (event.kind) {
     case 'moved':
-      return `  Moved from node ${event.fromNodeId} to node ${event.toNodeId}.`;
+      return t.game.events.moved(event.fromNodeId, event.toNodeId);
     case 'blocked':
-      return `  Cannot move to node ${event.attemptedNodeId} — not adjacent.`;
+      return t.game.events.blocked(event.attemptedNodeId);
     case 'battle':
-      return `  Battle! You dealt ${event.enemyDamage}, took ${event.playerDamage} damage.`;
+      return t.game.events.battle(event.enemyDamage, event.playerDamage);
     case 'bossDefeated':
-      return `  The boss has been defeated! Victory!`;
+      return t.game.events.bossDefeated;
     case 'bossCounterattack':
-      return `  The boss counterattacks for ${event.damage} damage!`;
+      return t.game.events.bossCounterattack(event.damage);
     case 'event':
-      return `  Event: power ${event.powerDelta >= 0 ? '+' : ''}${event.powerDelta}.`;
+      return t.game.events.event(event.powerDelta);
     case 'attrition':
-      return `  Attrition: ${event.powerDelta} power.`;
+      return t.game.events.attrition(event.powerDelta);
     case 'enemyGrowth':
-      return `  The enemy grows stronger: +${event.powerDelta} power.`;
+      return t.game.events.enemyGrowth(event.powerDelta);
     case 'itemAcquired':
-      return `  Found a ${event.itemType}! (added to inventory)`;
+      return t.game.events.itemAcquired(t.itemType[event.itemType]);
     case 'itemEffectTriggered':
-      return `  Your ${event.itemType} absorbed ${event.damageBlocked} damage!`;
+      return t.game.events.itemEffectTriggered(t.itemType[event.itemType], event.damageBlocked);
     case 'itemUsed':
-      return `  Used ${event.itemType}.${event.powerDelta !== undefined ? ` (+${event.powerDelta} power)` : ' (shield raised)'}`;
+      return t.game.events.itemUsed(t.itemType[event.itemType], event.powerDelta);
     case 'itemUseFailed':
-      return `  You don't have a ${event.itemType} to use.`;
+      return t.game.events.itemUseFailed(t.itemType[event.itemType]);
     case 'rested':
-      return `  Rested: +${event.powerDelta} power.`;
+      return t.game.events.rested(event.powerDelta);
   }
 }

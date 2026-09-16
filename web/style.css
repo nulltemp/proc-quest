@@ -8,6 +8,75 @@ body {
   padding: 1.5rem;
 }
 
+#start-screen[hidden],
+#game-screen[hidden] {
+  display: none;
+}
+
+.lang-switcher {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+#start-screen {
+  min-height: calc(100vh - 3rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.start-card {
+  width: 100%;
+  max-width: 26rem;
+  padding: 2rem;
+  border: 1px solid #8888;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.start-card h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.start-subtitle {
+  margin: -0.75rem 0 0;
+  opacity: 0.75;
+  font-size: 0.9rem;
+}
+
+.start-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.start-field label {
+  font-size: 0.9rem;
+}
+
+.start-field input[type='range'] {
+  width: 100%;
+}
+
+.start-field input[type='number'] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.4rem;
+}
+
+#start-btn {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 header h1 {
   font-size: 1.25rem;
   margin: 0 0 0.75rem;
