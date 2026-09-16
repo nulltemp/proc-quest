@@ -14,6 +14,20 @@ import { resolveLocale, getMessages, type Locale } from '../src/i18n/index.js';
 
 const LANG_STORAGE_KEY = 'proc-quest-lang';
 
+const langLabel = document.querySelector<HTMLLabelElement>('#lang-label')!;
+const langSelect = document.querySelector<HTMLSelectElement>('#lang-select')!;
+
+const startScreen = document.querySelector<HTMLElement>('#start-screen')!;
+const gameScreen = document.querySelector<HTMLElement>('#game-screen')!;
+const startTitle = document.querySelector<HTMLHeadingElement>('#start-title')!;
+const startSubtitle = document.querySelector<HTMLParagraphElement>('#start-subtitle')!;
+const startSizeFieldLabel = document.querySelector<HTMLLabelElement>('#start-size-field-label')!;
+const startSizeInput = document.querySelector<HTMLInputElement>('#start-size-input')!;
+const startSeedFieldLabel = document.querySelector<HTMLLabelElement>('#start-seed-field-label')!;
+const startSeedInput = document.querySelector<HTMLInputElement>('#start-seed-input')!;
+const startBtn = document.querySelector<HTMLButtonElement>('#start-btn')!;
+const newGameBtn = document.querySelector<HTMLButtonElement>('#new-game-btn')!;
+
 const appTitle = document.querySelector<HTMLHeadingElement>('#app-title')!;
 const seedLabel = document.querySelector<HTMLLabelElement>('#seed-label')!;
 const mapContainer = document.querySelector<HTMLDivElement>('#map-container')!;
@@ -22,8 +36,6 @@ const seedInput = document.querySelector<HTMLInputElement>('#seed-input')!;
 const seedDisplay = document.querySelector<HTMLSpanElement>('#seed-display')!;
 const regenerateBtn = document.querySelector<HTMLButtonElement>('#regenerate-btn')!;
 const randomBtn = document.querySelector<HTMLButtonElement>('#random-btn')!;
-const langLabel = document.querySelector<HTMLLabelElement>('#lang-label')!;
-const langSelect = document.querySelector<HTMLSelectElement>('#lang-select')!;
 const logHeading = document.querySelector<HTMLHeadingElement>('#log-heading')!;
 const banner = document.querySelector<HTMLDivElement>('#banner')!;
 const statusPanel = document.querySelector<HTMLDivElement>('#status-panel')!;
@@ -31,6 +43,7 @@ const logPanel = document.querySelector<HTMLUListElement>('#log-panel')!;
 
 let map: GeneratedMap;
 let gameState: GameState;
+let nodeCount = 20;
 let locale: Locale = resolveLocale(
   (() => {
     try {
@@ -43,15 +56,38 @@ let locale: Locale = resolveLocale(
 
 langSelect.value = locale;
 
+// Default map config uses nodeCount 20 in a 100x100 area; scale width/height
+// with sqrt(nodeCount) so node density (and therefore min-spacing feasibility)
+// stays roughly constant as the player picks a larger or smaller map.
+function sizeLabelFor(count: number): string {
+  const t = getMessages(locale);
+  if (count < 20) return t.web.sizeSmall;
+  if (count < 45) return t.web.sizeMedium;
+  return t.web.sizeLarge;
+}
+
+function updateStartSizeDisplay(): void {
+  const t = getMessages(locale);
+  const count = Number(startSizeInput.value);
+  startSizeFieldLabel.textContent = t.web.mapSizeLabel(count, sizeLabelFor(count));
+}
+
 function applyStaticLabels(): void {
   const t = getMessages(locale);
-  appTitle.textContent = t.web.title;
   document.title = t.web.title;
+  langLabel.textContent = t.web.langLabel;
+  startTitle.textContent = t.web.startTitle;
+  startSubtitle.textContent = t.web.startSubtitle;
+  startSeedFieldLabel.textContent = t.web.seedOptionalLabel;
+  startSeedInput.placeholder = t.web.seedPlaceholder;
+  startBtn.textContent = t.web.startButton;
+  newGameBtn.textContent = t.web.newGameButton;
+  appTitle.textContent = t.web.title;
   seedLabel.textContent = t.web.seedLabel;
   regenerateBtn.textContent = t.web.regenerate;
   randomBtn.textContent = t.web.randomSeed;
-  langLabel.textContent = t.web.langLabel;
   logHeading.textContent = t.web.log;
+  updateStartSizeDisplay();
 }
 
 function renderLegend(): void {
@@ -66,7 +102,8 @@ function renderLegend(): void {
 
 function regenerate(seed?: number): void {
   const t = getMessages(locale);
-  map = generateMap(seed !== undefined ? { seed } : {});
+  const side = Math.round(100 * Math.sqrt(nodeCount / 20));
+  map = generateMap({ nodeCount, width: side, height: side, ...(seed !== undefined ? { seed } : {}) });
   gameState = createInitialState(map, { seed: map.config.seed });
 
   seedInput.value = String(map.config.seed);
@@ -74,6 +111,7 @@ function regenerate(seed?: number): void {
 
   const url = new URL(location.href);
   url.searchParams.set('seed', String(map.config.seed));
+  url.searchParams.set('size', String(nodeCount));
   history.replaceState(null, '', url);
 
   logPanel.replaceChildren();
@@ -81,6 +119,20 @@ function regenerate(seed?: number): void {
   banner.textContent = '';
 
   renderGame();
+}
+
+function startGame(): void {
+  nodeCount = Number(startSizeInput.value);
+  const seedValue = Number(startSeedInput.value);
+  regenerate(startSeedInput.value !== '' && Number.isFinite(seedValue) ? seedValue : undefined);
+
+  startScreen.hidden = true;
+  gameScreen.hidden = false;
+}
+
+function backToStartScreen(): void {
+  gameScreen.hidden = true;
+  startScreen.hidden = false;
 }
 
 function renderGame(): void {
@@ -120,6 +172,12 @@ regenerateBtn.addEventListener('click', () => {
 
 randomBtn.addEventListener('click', () => regenerate());
 
+newGameBtn.addEventListener('click', () => backToStartScreen());
+
+startSizeInput.addEventListener('input', () => updateStartSizeDisplay());
+
+startBtn.addEventListener('click', () => startGame());
+
 langSelect.addEventListener('change', () => {
   locale = resolveLocale(langSelect.value);
   try {
@@ -129,7 +187,7 @@ langSelect.addEventListener('change', () => {
   }
   applyStaticLabels();
   renderLegend();
-  renderGame();
+  if (!gameScreen.hidden) renderGame();
 });
 
 mapContainer.addEventListener('click', (event) => {
@@ -149,6 +207,12 @@ mapContainer.addEventListener('click', (event) => {
 applyStaticLabels();
 renderLegend();
 
-const initialSeedParam = new URLSearchParams(location.search).get('seed');
-const initialSeed = initialSeedParam !== null ? Number(initialSeedParam) : undefined;
-regenerate(Number.isFinite(initialSeed as number) ? initialSeed : undefined);
+const initialParams = new URLSearchParams(location.search);
+const initialSeedParam = initialParams.get('seed');
+const initialSizeParam = initialParams.get('size');
+
+if (initialSeedParam !== null) startSeedInput.value = initialSeedParam;
+if (initialSizeParam !== null && Number.isFinite(Number(initialSizeParam))) {
+  startSizeInput.value = initialSizeParam;
+}
+updateStartSizeDisplay();

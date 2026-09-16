@@ -46,5 +46,15 @@ export interface Messages {
     log: string;
     langLabel: string;
     turnLog: (turn: number) => string;
+    startTitle: string;
+    startSubtitle: string;
+    mapSizeLabel: (count: number, sizeLabel: string) => string;
+    sizeSmall: string;
+    sizeMedium: string;
+    sizeLarge: string;
+    seedOptionalLabel: string;
+    seedPlaceholder: string;
+    startButton: string;
+    newGameButton: string;
   };
 }
