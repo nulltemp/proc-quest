@@ -8,26 +8,46 @@
 </head>
 <body>
   <div id="app">
-    <header>
-      <h1>proc-quest map viewer</h1>
-      <div class="controls">
-        <label for="seed-input">Seed</label>
-        <input id="seed-input" type="number" step="1" />
-        <button id="regenerate-btn" type="button">Regenerate</button>
-        <button id="random-btn" type="button">Random seed</button>
-        <span id="seed-display"></span>
+    <section id="start-screen">
+      <div class="start-card">
+        <h1>proc-quest</h1>
+        <p class="start-subtitle">A procedurally generated graph-map adventure.</p>
+        <div class="start-field">
+          <label for="start-size-input">
+            Map size: <span id="start-size-value"></span> nodes (<span id="start-size-label"></span>)
+          </label>
+          <input id="start-size-input" type="range" min="8" max="80" step="1" value="20" />
+        </div>
+        <div class="start-field">
+          <label for="start-seed-input">Seed (optional)</label>
+          <input id="start-seed-input" type="number" step="1" placeholder="random" />
+        </div>
+        <button id="start-btn" type="button">Start</button>
       </div>
-    </header>
-    <div id="banner" role="status"></div>
-    <main>
-      <div id="map-container"></div>
-      <aside id="game-panel">
-        <div id="status-panel"></div>
-        <h2>Log</h2>
-        <ul id="log-panel"></ul>
-      </aside>
-      <ul id="legend" class="legend"></ul>
-    </main>
+    </section>
+    <section id="game-screen" hidden>
+      <header>
+        <h1>proc-quest map viewer</h1>
+        <div class="controls">
+          <label for="seed-input">Seed</label>
+          <input id="seed-input" type="number" step="1" />
+          <button id="regenerate-btn" type="button">Regenerate</button>
+          <button id="random-btn" type="button">Random seed</button>
+          <button id="new-game-btn" type="button">New game / map size</button>
+          <span id="seed-display"></span>
+        </div>
+      </header>
+      <div id="banner" role="status"></div>
+      <main>
+        <div id="map-container"></div>
+        <aside id="game-panel">
+          <div id="status-panel"></div>
+          <h2>Log</h2>
+          <ul id="log-panel"></ul>
+        </aside>
+        <ul id="legend" class="legend"></ul>
+      </main>
+    </section>
   </div>
   <script type="module" src="./main.ts"></script>
 </body>

@@ -11,6 +11,15 @@ import {
 } from '../src/game/index.js';
 import type { GameState, GameCommand } from '../src/game/index.js';
 
+const startScreen = document.querySelector<HTMLElement>('#start-screen')!;
+const gameScreen = document.querySelector<HTMLElement>('#game-screen')!;
+const startSizeInput = document.querySelector<HTMLInputElement>('#start-size-input')!;
+const startSizeValue = document.querySelector<HTMLSpanElement>('#start-size-value')!;
+const startSizeLabel = document.querySelector<HTMLSpanElement>('#start-size-label')!;
+const startSeedInput = document.querySelector<HTMLInputElement>('#start-seed-input')!;
+const startBtn = document.querySelector<HTMLButtonElement>('#start-btn')!;
+const newGameBtn = document.querySelector<HTMLButtonElement>('#new-game-btn')!;
+
 const mapContainer = document.querySelector<HTMLDivElement>('#map-container')!;
 const legend = document.querySelector<HTMLUListElement>('#legend')!;
 const seedInput = document.querySelector<HTMLInputElement>('#seed-input')!;
@@ -23,6 +32,7 @@ const logPanel = document.querySelector<HTMLUListElement>('#log-panel')!;
 
 let map: GeneratedMap;
 let gameState: GameState;
+let nodeCount = 20;
 
 for (const type of Object.values(NODE_TYPES)) {
   const item = document.createElement('li');
@@ -30,8 +40,24 @@ for (const type of Object.values(NODE_TYPES)) {
   legend.appendChild(item);
 }
 
+// Default map config uses nodeCount 20 in a 100x100 area; scale width/height
+// with sqrt(nodeCount) so node density (and therefore min-spacing feasibility)
+// stays roughly constant as the player picks a larger or smaller map.
+function sizeLabelFor(count: number): string {
+  if (count < 20) return 'Small';
+  if (count < 45) return 'Medium';
+  return 'Large';
+}
+
+function updateStartSizeDisplay(): void {
+  const count = Number(startSizeInput.value);
+  startSizeValue.textContent = String(count);
+  startSizeLabel.textContent = sizeLabelFor(count);
+}
+
 function regenerate(seed?: number): void {
-  map = generateMap(seed !== undefined ? { seed } : {});
+  const side = Math.round(100 * Math.sqrt(nodeCount / 20));
+  map = generateMap({ nodeCount, width: side, height: side, ...(seed !== undefined ? { seed } : {}) });
   gameState = createInitialState(map, { seed: map.config.seed });
 
   seedInput.value = String(map.config.seed);
@@ -39,6 +65,7 @@ function regenerate(seed?: number): void {
 
   const url = new URL(location.href);
   url.searchParams.set('seed', String(map.config.seed));
+  url.searchParams.set('size', String(nodeCount));
   history.replaceState(null, '', url);
 
   logPanel.replaceChildren();
@@ -46,6 +73,20 @@ function regenerate(seed?: number): void {
   banner.textContent = '';
 
   renderGame();
+}
+
+function startGame(): void {
+  nodeCount = Number(startSizeInput.value);
+  const seedValue = Number(startSeedInput.value);
+  regenerate(startSeedInput.value !== '' && Number.isFinite(seedValue) ? seedValue : undefined);
+
+  startScreen.hidden = true;
+  gameScreen.hidden = false;
+}
+
+function backToStartScreen(): void {
+  gameScreen.hidden = true;
+  startScreen.hidden = false;
 }
 
 function renderGame(): void {
@@ -84,6 +125,12 @@ regenerateBtn.addEventListener('click', () => {
 
 randomBtn.addEventListener('click', () => regenerate());
 
+newGameBtn.addEventListener('click', () => backToStartScreen());
+
+startSizeInput.addEventListener('input', () => updateStartSizeDisplay());
+
+startBtn.addEventListener('click', () => startGame());
+
 mapContainer.addEventListener('click', (event) => {
   if (gameState.status !== 'ongoing') return;
 
@@ -98,6 +145,12 @@ mapContainer.addEventListener('click', (event) => {
   renderGame();
 });
 
-const initialSeedParam = new URLSearchParams(location.search).get('seed');
-const initialSeed = initialSeedParam !== null ? Number(initialSeedParam) : undefined;
-regenerate(Number.isFinite(initialSeed as number) ? initialSeed : undefined);
+const initialParams = new URLSearchParams(location.search);
+const initialSeedParam = initialParams.get('seed');
+const initialSizeParam = initialParams.get('size');
+
+if (initialSeedParam !== null) startSeedInput.value = initialSeedParam;
+if (initialSizeParam !== null && Number.isFinite(Number(initialSizeParam))) {
+  startSizeInput.value = initialSizeParam;
+}
+updateStartSizeDisplay();
