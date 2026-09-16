@@ -13,6 +13,14 @@ body {
   display: none;
 }
 
+.lang-switcher {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
 #start-screen {
   min-height: calc(100vh - 3rem);
   display: flex;

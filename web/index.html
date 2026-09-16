@@ -8,18 +8,23 @@
 </head>
 <body>
   <div id="app">
+    <div class="lang-switcher">
+      <label id="lang-label" for="lang-select">Language</label>
+      <select id="lang-select">
+        <option value="en">English</option>
+        <option value="ja">日本語</option>
+      </select>
+    </div>
     <section id="start-screen">
       <div class="start-card">
-        <h1>proc-quest</h1>
-        <p class="start-subtitle">A procedurally generated graph-map adventure.</p>
+        <h1 id="start-title">proc-quest</h1>
+        <p id="start-subtitle" class="start-subtitle">A procedurally generated graph-map adventure.</p>
         <div class="start-field">
-          <label for="start-size-input">
-            Map size: <span id="start-size-value"></span> nodes (<span id="start-size-label"></span>)
-          </label>
+          <label id="start-size-field-label" for="start-size-input"></label>
           <input id="start-size-input" type="range" min="8" max="80" step="1" value="20" />
         </div>
         <div class="start-field">
-          <label for="start-seed-input">Seed (optional)</label>
+          <label id="start-seed-field-label" for="start-seed-input">Seed (optional)</label>
           <input id="start-seed-input" type="number" step="1" placeholder="random" />
         </div>
         <button id="start-btn" type="button">Start</button>
@@ -27,9 +32,9 @@
     </section>
     <section id="game-screen" hidden>
       <header>
-        <h1>proc-quest map viewer</h1>
+        <h1 id="app-title">proc-quest map viewer</h1>
         <div class="controls">
-          <label for="seed-input">Seed</label>
+          <label id="seed-label" for="seed-input">Seed</label>
           <input id="seed-input" type="number" step="1" />
           <button id="regenerate-btn" type="button">Regenerate</button>
           <button id="random-btn" type="button">Random seed</button>
@@ -42,7 +47,7 @@
         <div id="map-container"></div>
         <aside id="game-panel">
           <div id="status-panel"></div>
-          <h2>Log</h2>
+          <h2 id="log-heading">Log</h2>
           <ul id="log-panel"></ul>
         </aside>
         <ul id="legend" class="legend"></ul>
