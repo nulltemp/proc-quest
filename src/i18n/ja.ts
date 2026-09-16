@@ -27,6 +27,8 @@ export const ja: Messages = {
     turnStatus: (turn, nodeId, nodeType) => `ターン${turn} — ノード${nodeId} (${nodeType}) にいます`,
     power: (player, enemy) => `自軍の戦力: ${player}  |  敵軍の戦力: ${enemy}`,
     activeEffects: (summary) => `効果: ${summary}`,
+    inventory: (summary) => `所持品: ${summary}`,
+    inventoryEmpty: '所持品: (なし)',
     moveTo: (options) => `移動先: ${options}`,
     events: {
       moved: (from, to) => `  ノード${from}からノード${to}へ移動しました。`,
@@ -36,16 +38,21 @@ export const ja: Messages = {
       bossCounterattack: (damage) => `  ボスの反撃！ ${damage}のダメージ！`,
       event: (powerDelta) => `  イベント: 戦力 ${powerDelta >= 0 ? '+' : ''}${powerDelta}。`,
       attrition: (powerDelta) => `  消耗: 戦力 ${powerDelta}。`,
-      itemAcquired: (itemLabel, powerDelta) =>
-        `  ${itemLabel}を見つけました！${powerDelta !== undefined ? `（戦力+${powerDelta}）` : ''}`,
+      enemyGrowth: (powerDelta) => `  敵の戦力が増強されました: +${powerDelta}。`,
+      itemAcquired: (itemLabel) => `  ${itemLabel}を見つけました！(所持品に追加)`,
       itemEffectTriggered: (itemLabel, damageBlocked) => `  ${itemLabel}が${damageBlocked}のダメージを吸収しました！`,
+      itemUsed: (itemLabel, powerDelta) =>
+        `  ${itemLabel}を使用しました。${powerDelta !== undefined ? `(戦力+${powerDelta})` : '(シールド展開)'}`,
+      itemUseFailed: (itemLabel) => `  ${itemLabel}を所持していません。`,
+      rested: (powerDelta) => `  休息: 戦力+${powerDelta}。`,
     },
   },
   cli: {
     reproduce: (seed) => `再現するには: node dist/index.js ${seed}`,
-    gameStart: '--- ゲーム開始（ノードIDを入力して移動、"quit"で終了） ---',
+    gameStart:
+      '--- ゲーム開始（ノードIDを入力して移動、"rest"で戦力回復、"use <item>"でアイテム使用、"quit"で終了） ---',
     noMoves: '移動できるノードがありません。ゲームを終了します。',
-    invalidNodeId: '有効なノードIDを入力してください。',
+    invalidCommand: 'ノードID、"rest"、または"use <item>"を入力してください。',
     victory: '敵のボスを倒しました！ 勝利！',
     gameOver: '自軍の戦力が尽きました。ゲームオーバー。',
     gameEnded: 'ゲーム終了。',
@@ -68,5 +75,7 @@ export const ja: Messages = {
     seedPlaceholder: 'ランダム',
     startButton: 'スタート',
     newGameButton: '新しいゲーム / マップサイズ',
+    restAction: '休息',
+    useItemAction: (itemLabel, count) => `${itemLabel}を使用 (${count})`,
   },
 };

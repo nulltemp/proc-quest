@@ -1,7 +1,7 @@
 import type { MapNode } from '../map/index.js';
 import { resolveSkirmish, resolveBossEncounter, randomInt } from './combat.js';
 import { EVENT_POWER_RANGE } from './constants.js';
-import { applyItemPickup, consumeShieldIfPresent } from './items.js';
+import { pickUpItem, consumeShieldIfPresent } from './items.js';
 import type { FactionState, TurnEvent } from './types.js';
 
 export interface NodeEffectResult {
@@ -79,13 +79,11 @@ export function resolveNodeArrival(
       };
     }
     case 'treasure': {
-      const pickup = applyItemPickup(rng, player);
+      const pickup = pickUpItem(rng, player);
       return {
         player: pickup.player,
         enemy,
-        events: [
-          { kind: 'itemAcquired', nodeId: node.id, itemType: pickup.itemType, powerDelta: pickup.powerDelta },
-        ],
+        events: [{ kind: 'itemAcquired', nodeId: node.id, itemType: pickup.itemType }],
       };
     }
     case 'start':

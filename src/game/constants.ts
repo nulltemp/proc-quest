@@ -12,3 +12,5 @@ export const BOSS_COUNTER_DAMAGE = 30;
 export const EVENT_POWER_RANGE: readonly [number, number] = [-10, 10];
 export const POWER_TONIC_RANGE: readonly [number, number] = [15, 25];
 export const GUARDIAN_WARD_CHARGES = 1;
+export const ENEMY_POWER_GROWTH_PER_TURN = 1;
+export const REST_HEAL_RANGE: readonly [number, number] = [5, 10];

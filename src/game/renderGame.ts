@@ -15,6 +15,17 @@ export function formatGameStatus(map: GeneratedMap, state: GameState, locale: Lo
   if (effects.length > 0) {
     lines.push(t.game.activeEffects(formatActiveEffects(effects, locale)));
   }
+  const inventory = state.factions.player.inventory;
+  const heldItems = Object.entries(inventory).filter(([, count]) => (count ?? 0) > 0);
+  lines.push(
+    heldItems.length > 0
+      ? t.game.inventory(
+          heldItems
+            .map(([type, count]) => `${t.itemType[type as keyof typeof t.itemType]} x${count}`)
+            .join(', '),
+        )
+      : t.game.inventoryEmpty,
+  );
   return lines.join('\n');
 }
 
@@ -62,9 +73,17 @@ function formatEvent(event: TurnEvent, t: ReturnType<typeof getMessages>): strin
       return t.game.events.event(event.powerDelta);
     case 'attrition':
       return t.game.events.attrition(event.powerDelta);
+    case 'enemyGrowth':
+      return t.game.events.enemyGrowth(event.powerDelta);
     case 'itemAcquired':
-      return t.game.events.itemAcquired(t.itemType[event.itemType], event.powerDelta);
+      return t.game.events.itemAcquired(t.itemType[event.itemType]);
     case 'itemEffectTriggered':
       return t.game.events.itemEffectTriggered(t.itemType[event.itemType], event.damageBlocked);
+    case 'itemUsed':
+      return t.game.events.itemUsed(t.itemType[event.itemType], event.powerDelta);
+    case 'itemUseFailed':
+      return t.game.events.itemUseFailed(t.itemType[event.itemType]);
+    case 'rested':
+      return t.game.events.rested(event.powerDelta);
   }
 }

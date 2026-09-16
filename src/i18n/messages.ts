@@ -16,6 +16,8 @@ export interface Messages {
     turnStatus: (turn: number, nodeId: number, nodeType: string) => string;
     power: (player: number, enemy: number) => string;
     activeEffects: (summary: string) => string;
+    inventory: (summary: string) => string;
+    inventoryEmpty: string;
     moveTo: (options: string) => string;
     events: {
       moved: (from: number, to: number) => string;
@@ -25,15 +27,19 @@ export interface Messages {
       bossCounterattack: (damage: number) => string;
       event: (powerDelta: number) => string;
       attrition: (powerDelta: number) => string;
-      itemAcquired: (itemLabel: string, powerDelta?: number) => string;
+      enemyGrowth: (powerDelta: number) => string;
+      itemAcquired: (itemLabel: string) => string;
       itemEffectTriggered: (itemLabel: string, damageBlocked: number) => string;
+      itemUsed: (itemLabel: string, powerDelta?: number) => string;
+      itemUseFailed: (itemLabel: string) => string;
+      rested: (powerDelta: number) => string;
     };
   };
   cli: {
     reproduce: (seed: number) => string;
     gameStart: string;
     noMoves: string;
-    invalidNodeId: string;
+    invalidCommand: string;
     victory: string;
     gameOver: string;
     gameEnded: string;
@@ -56,5 +62,7 @@ export interface Messages {
     seedPlaceholder: string;
     startButton: string;
     newGameButton: string;
+    restAction: string;
+    useItemAction: (itemLabel: string, count: number) => string;
   };
 }

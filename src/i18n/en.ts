@@ -27,6 +27,8 @@ export const en: Messages = {
     turnStatus: (turn, nodeId, nodeType) => `Turn ${turn} — at node ${nodeId} (${nodeType})`,
     power: (player, enemy) => `Player power: ${player}  |  Enemy power: ${enemy}`,
     activeEffects: (summary) => `Active effects: ${summary}`,
+    inventory: (summary) => `Inventory: ${summary}`,
+    inventoryEmpty: 'Inventory: (empty)',
     moveTo: (options) => `Move to: ${options}`,
     events: {
       moved: (from, to) => `  Moved from node ${from} to node ${to}.`,
@@ -36,16 +38,21 @@ export const en: Messages = {
       bossCounterattack: (damage) => `  The boss counterattacks for ${damage} damage!`,
       event: (powerDelta) => `  Event: power ${powerDelta >= 0 ? '+' : ''}${powerDelta}.`,
       attrition: (powerDelta) => `  Attrition: ${powerDelta} power.`,
-      itemAcquired: (itemLabel, powerDelta) =>
-        `  Found a ${itemLabel}!${powerDelta !== undefined ? ` (+${powerDelta} power)` : ''}`,
+      enemyGrowth: (powerDelta) => `  The enemy grows stronger: +${powerDelta} power.`,
+      itemAcquired: (itemLabel) => `  Found a ${itemLabel}! (added to inventory)`,
       itemEffectTriggered: (itemLabel, damageBlocked) => `  Your ${itemLabel} absorbed ${damageBlocked} damage!`,
+      itemUsed: (itemLabel, powerDelta) =>
+        `  Used ${itemLabel}.${powerDelta !== undefined ? ` (+${powerDelta} power)` : ' (shield raised)'}`,
+      itemUseFailed: (itemLabel) => `  You don't have a ${itemLabel} to use.`,
+      rested: (powerDelta) => `  Rested: +${powerDelta} power.`,
     },
   },
   cli: {
     reproduce: (seed) => `Reproduce with: node dist/index.js ${seed}`,
-    gameStart: '--- Game start (type a node id to move, or "quit" to exit) ---',
+    gameStart:
+      '--- Game start (type a node id to move, "rest" to recover power, "use <item>" to use an item, or "quit" to exit) ---',
     noMoves: 'No moves available. Ending game.',
-    invalidNodeId: 'Please enter a valid node id.',
+    invalidCommand: 'Please enter a node id, "rest", or "use <item>".',
     victory: 'You defeated the enemy boss! Victory!',
     gameOver: 'Your faction has been depleted. Game over.',
     gameEnded: 'Game ended.',
@@ -68,5 +75,7 @@ export const en: Messages = {
     seedPlaceholder: 'random',
     startButton: 'Start',
     newGameButton: 'New game / map size',
+    restAction: 'Rest',
+    useItemAction: (itemLabel, count) => `Use ${itemLabel} (${count})`,
   },
 };

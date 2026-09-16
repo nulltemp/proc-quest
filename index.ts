@@ -8,7 +8,30 @@ import {
   formatMoveOptions,
   formatTurnEvents,
 } from './src/game/index.js';
+import type { GameCommand, ItemType } from './src/game/index.js';
 import { resolveLocale, getMessages } from './src/i18n/index.js';
+
+const ITEM_ALIASES: Record<string, ItemType> = {
+  powertonic: 'powerTonic',
+  tonic: 'powerTonic',
+  guardianward: 'guardianWard',
+  ward: 'guardianWard',
+};
+
+function parseCommand(input: string): GameCommand | 'quit' | undefined {
+  const trimmed = input.trim();
+  const lower = trimmed.toLowerCase();
+
+  if (lower === 'quit') return 'quit';
+  if (lower === 'rest') return { type: 'rest' };
+  if (lower.startsWith('use ')) {
+    const itemType = ITEM_ALIASES[lower.slice(4).trim().replace(/\s+/g, '')];
+    return itemType ? { type: 'useItem', itemType } : undefined;
+  }
+
+  const targetNodeId = Number(trimmed);
+  return Number.isInteger(targetNodeId) ? { type: 'move', targetNodeId } : undefined;
+}
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
@@ -43,16 +66,15 @@ async function main(): Promise<void> {
     }
     console.log(t.game.moveTo(formatMoveOptions(map, state.currentNodeId, locale)));
 
-    const answer = (await rl.question('> ')).trim();
-    if (answer.toLowerCase() === 'quit') break;
-
-    const targetNodeId = Number(answer);
-    if (!Number.isInteger(targetNodeId)) {
-      console.log(t.cli.invalidNodeId);
+    const answer = await rl.question('> ');
+    const command = parseCommand(answer);
+    if (command === 'quit') break;
+    if (command === undefined) {
+      console.log(t.cli.invalidCommand);
       continue;
     }
 
-    state = advanceTurn(map, state, { type: 'move', targetNodeId });
+    state = advanceTurn(map, state, command);
     console.log(formatTurnEvents(state.lastTurnEvents, locale));
   }
 
