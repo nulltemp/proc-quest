@@ -65,5 +65,7 @@ export interface Messages {
     newGameButton: string;
     restAction: string;
     useItemAction: (itemLabel: string, count: number) => string;
+    nodeInfo: (id: number, typeLabel: string) => string;
+    notAdjacentHint: string;
   };
 }
