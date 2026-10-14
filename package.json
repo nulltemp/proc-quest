@@ -13,13 +13,18 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "vite",
-    "build:web": "vite build",
+    "build:web": "tsc -p web/tsconfig.json && vite build",
     "preview": "vite preview",
+    "deploy": "npm run build:web && wrangler deploy",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=22.12"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
     "typescript": "^5.9.3",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "wrangler": "^4.142.0"
   }
 }

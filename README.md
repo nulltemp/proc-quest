@@ -51,6 +51,17 @@ npm run dev
 - 画面右側のステータス/ログパネルにターン経過・勢力・イベントが表示され、勝敗が決まるとバナーが表示されてクリックを受け付けなくなる
 - 「Regenerate」「Random seed」ボタンはマップと同時にゲームも初期化する(やり直し)
 
+## デプロイ(Cloudflare Workers)
+
+ブラウザ版は Cloudflare Workers の Static Assets として配信する(Worker スクリプトなし、`dist-web/` をそのまま配信)。設定は `wrangler.jsonc`。
+
+```
+npx wrangler login   # 初回のみ
+npm run deploy       # build:web → wrangler deploy
+```
+
+GitHub 連携(Workers Builds)で自動デプロイする場合は、ビルドコマンドに `npm run build:web`、デプロイコマンドに `npx wrangler deploy` を指定する。Worker 名はダッシュボード側と `wrangler.jsonc` の `name` を一致させること。
+
 ## プロジェクト構成
 
 - `index.ts` — CLIエントリポイント(マップ表示 + 対話的なターンループ)

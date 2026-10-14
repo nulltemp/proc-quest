@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "proc-quest",
+  "compatibility_date": "2026-09-28",
+  // Static-assets-only Worker: serves the Vite build output of web/ (no Worker script).
+  "assets": {
+    "directory": "./dist-web"
+  }
+}
