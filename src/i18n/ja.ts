@@ -45,6 +45,7 @@ export const ja: Messages = {
         `  ${itemLabel}を使用しました。${powerDelta !== undefined ? `(戦力+${powerDelta})` : '(シールド展開)'}`,
       itemUseFailed: (itemLabel) => `  ${itemLabel}を所持していません。`,
       rested: (powerDelta) => `  休息: 戦力+${powerDelta}。`,
+      nodeAlreadyCleared: (nodeId) => `  ノード${nodeId}は踏破済みです — 何も起きませんでした。`,
     },
   },
   cli: {

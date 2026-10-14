@@ -85,5 +85,7 @@ function formatEvent(event: TurnEvent, t: ReturnType<typeof getMessages>): strin
       return t.game.events.itemUseFailed(t.itemType[event.itemType]);
     case 'rested':
       return t.game.events.rested(event.powerDelta);
+    case 'nodeAlreadyCleared':
+      return t.game.events.nodeAlreadyCleared(event.nodeId);
   }
 }

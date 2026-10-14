@@ -143,7 +143,7 @@ function renderGame(): void {
     : [];
 
   mapContainer.replaceChildren(
-    renderMapToSvg(map, { currentNodeId: gameState.currentNodeId, reachableNodeIds }, locale),
+    renderMapToSvg(map, { currentNodeId: gameState.currentNodeId, reachableNodeIds, clearedNodeIds: gameState.clearedNodeIds }, locale),
   );
 
   statusPanel.textContent = gameState.status === 'ongoing'

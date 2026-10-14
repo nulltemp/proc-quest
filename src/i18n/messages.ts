@@ -33,6 +33,7 @@ export interface Messages {
       itemUsed: (itemLabel: string, powerDelta?: number) => string;
       itemUseFailed: (itemLabel: string) => string;
       rested: (powerDelta: number) => string;
+      nodeAlreadyCleared: (nodeId: number) => string;
     };
   };
   cli: {

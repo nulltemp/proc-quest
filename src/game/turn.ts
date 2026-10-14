@@ -4,7 +4,7 @@ import { ATTRITION_PER_TURN, ENEMY_POWER_GROWTH_PER_TURN, FACTION_IDS, REST_HEAL
 import { randomInt } from './combat.js';
 import { useItem } from './items.js';
 import { canMoveTo } from './movement.js';
-import { resolveNodeArrival } from './nodeEffects.js';
+import { isOneShotNodeType, resolveNodeArrival } from './nodeEffects.js';
 import type { FactionState, GameCommand, GameState, TurnEvent } from './types.js';
 
 export function advanceTurn(map: GeneratedMap, state: GameState, command: GameCommand): GameState {
@@ -14,6 +14,7 @@ export function advanceTurn(map: GeneratedMap, state: GameState, command: GameCo
   const events: TurnEvent[] = [];
 
   let currentNodeId = state.currentNodeId;
+  let clearedNodeIds = state.clearedNodeIds;
   let player: FactionState = state.factions[FACTION_IDS.PLAYER];
   let enemy: FactionState = state.factions[FACTION_IDS.ENEMY];
 
@@ -24,11 +25,14 @@ export function advanceTurn(map: GeneratedMap, state: GameState, command: GameCo
         currentNodeId = command.targetNodeId;
 
         const node = map.nodes.find((n) => n.id === currentNodeId);
-        if (node) {
+        if (node && clearedNodeIds.includes(node.id)) {
+          events.push({ kind: 'nodeAlreadyCleared', nodeId: node.id });
+        } else if (node) {
           const result = resolveNodeArrival(node, rng, player, enemy);
           player = result.player;
           enemy = result.enemy;
           events.push(...result.events);
+          if (isOneShotNodeType(node.type)) clearedNodeIds = [...clearedNodeIds, node.id];
         }
       } else {
         events.push({ kind: 'blocked', attemptedNodeId: command.targetNodeId });
@@ -57,12 +61,15 @@ export function advanceTurn(map: GeneratedMap, state: GameState, command: GameCo
   player = { ...player, power: Math.max(0, player.power - ATTRITION_PER_TURN) };
   events.push({ kind: 'attrition', powerDelta: -ATTRITION_PER_TURN });
 
-  if (enemy.power > 0) {
+  // Only defeating the boss wins; wearing enemy power down to 0 via battles doesn't.
+  const bossDefeated = events.some((e) => e.kind === 'bossDefeated');
+
+  if (!bossDefeated) {
     enemy = { ...enemy, power: enemy.power + ENEMY_POWER_GROWTH_PER_TURN };
     events.push({ kind: 'enemyGrowth', powerDelta: ENEMY_POWER_GROWTH_PER_TURN });
   }
 
-  const status = enemy.power <= 0 ? 'won' : player.power <= 0 ? 'lost' : 'ongoing';
+  const status = bossDefeated ? 'won' : player.power <= 0 ? 'lost' : 'ongoing';
   const nextRngSeed = Math.floor(rng() * 2 ** 31);
 
   return {
@@ -75,5 +82,6 @@ export function advanceTurn(map: GeneratedMap, state: GameState, command: GameCo
     status,
     rngSeed: nextRngSeed,
     lastTurnEvents: events,
+    clearedNodeIds,
   };
 }

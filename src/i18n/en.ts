@@ -45,6 +45,7 @@ export const en: Messages = {
         `  Used ${itemLabel}.${powerDelta !== undefined ? ` (+${powerDelta} power)` : ' (shield raised)'}`,
       itemUseFailed: (itemLabel) => `  You don't have a ${itemLabel} to use.`,
       rested: (powerDelta) => `  Rested: +${powerDelta} power.`,
+      nodeAlreadyCleared: (nodeId) => `  Node ${nodeId} has already been cleared — nothing happens.`,
     },
   },
   cli: {

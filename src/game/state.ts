@@ -29,5 +29,6 @@ export function createInitialState(map: GeneratedMap, options: CreateGameOptions
     status: 'ongoing',
     rngSeed: options.seed ?? Math.floor(Math.random() * 2 ** 31),
     lastTurnEvents: [],
+    clearedNodeIds: [],
   };
 }

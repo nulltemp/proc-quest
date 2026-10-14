@@ -142,6 +142,10 @@ main {
   opacity: 0.9;
 }
 
+.node-cleared {
+  fill-opacity: 0.3;
+}
+
 .halo {
   fill: none;
   stroke-width: 0.4;

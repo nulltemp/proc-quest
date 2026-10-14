@@ -38,7 +38,8 @@ export type TurnEvent =
   | { kind: 'itemEffectTriggered'; nodeId: number; itemType: ItemType; damageBlocked: number }
   | { kind: 'itemUsed'; itemType: ItemType; powerDelta?: number }
   | { kind: 'itemUseFailed'; itemType: ItemType }
-  | { kind: 'rested'; powerDelta: number };
+  | { kind: 'rested'; powerDelta: number }
+  | { kind: 'nodeAlreadyCleared'; nodeId: number };
 
 export interface GameState {
   currentNodeId: number;
@@ -47,4 +48,6 @@ export interface GameState {
   status: GameStatus;
   rngSeed: number;
   lastTurnEvents: TurnEvent[];
+  /** One-shot nodes (battle/event/treasure) whose arrival effect has already fired. */
+  clearedNodeIds: number[];
 }

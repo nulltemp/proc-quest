@@ -19,6 +19,7 @@ function svgEl<K extends keyof SVGElementTagNameMap>(tag: K): SVGElementTagNameM
 export interface MapHighlights {
   currentNodeId?: number;
   reachableNodeIds?: number[];
+  clearedNodeIds?: number[];
 }
 
 export function renderMapToSvg(
@@ -30,6 +31,7 @@ export function renderMapToSvg(
   const { nodes, edges, config } = map;
   const nodesById = new Map(nodes.map((n) => [n.id, n]));
   const reachable = new Set(highlights.reachableNodeIds ?? []);
+  const cleared = new Set(highlights.clearedNodeIds ?? []);
 
   const toSvgX = (x: number) => x;
   const toSvgY = (y: number) => config.height - y;
@@ -83,6 +85,7 @@ export function renderMapToSvg(
     const classes = ['node', `node-${node.type}`];
     if (node.id === highlights.currentNodeId) classes.push('node-current');
     else if (reachable.has(node.id)) classes.push('node-reachable');
+    if (cleared.has(node.id)) classes.push('node-cleared');
     circle.setAttribute('class', classes.join(' '));
     circle.setAttribute('data-id', String(node.id));
     circle.setAttribute('data-type', node.type);

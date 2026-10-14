@@ -1,8 +1,15 @@
-import type { MapNode } from '../map/index.js';
+import type { MapNode, NodeType } from '../map/index.js';
 import { resolveSkirmish, resolveBossEncounter, randomInt } from './combat.js';
 import { EVENT_POWER_RANGE } from './constants.js';
 import { pickUpItem, consumeShieldIfPresent } from './items.js';
 import type { FactionState, TurnEvent } from './types.js';
+
+/** Node types whose arrival effect fires only on the first visit. */
+const ONE_SHOT_NODE_TYPES: ReadonlySet<NodeType> = new Set<NodeType>(['battle', 'event', 'treasure']);
+
+export function isOneShotNodeType(type: NodeType): boolean {
+  return ONE_SHOT_NODE_TYPES.has(type);
+}
 
 export interface NodeEffectResult {
   player: FactionState;
