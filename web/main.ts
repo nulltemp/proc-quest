@@ -150,13 +150,6 @@ function renderGame(): void {
     ? `${formatGameStatus(map, gameState, locale)}\n${t.game.moveTo(formatMoveOptions(map, gameState.currentNodeId, locale))}`
     : formatGameStatus(map, gameState, locale);
 
-  if (gameState.turnNumber > 0) {
-    const entry = document.createElement('li');
-    entry.textContent = `${t.web.turnLog(gameState.turnNumber)}\n${formatTurnEvents(gameState.lastTurnEvents, locale)}`;
-    logPanel.appendChild(entry);
-    logPanel.scrollTop = logPanel.scrollHeight;
-  }
-
   if (gameState.status === 'won') {
     banner.className = 'visible banner-won';
     banner.textContent = t.cli.victory;
@@ -171,7 +164,18 @@ function renderGame(): void {
 function runCommand(command: GameCommand): void {
   if (gameState.status !== 'ongoing') return;
   gameState = advanceTurn(map, gameState, command);
+  appendTurnLog();
   renderGame();
+}
+
+// Called once per advanced turn rather than from renderGame(), so re-rendering
+// (e.g. on a language change) doesn't append the last turn's events again.
+function appendTurnLog(): void {
+  const t = getMessages(locale);
+  const entry = document.createElement('li');
+  entry.textContent = `${t.web.turnLog(gameState.turnNumber)}\n${formatTurnEvents(gameState.lastTurnEvents, locale)}`;
+  logPanel.appendChild(entry);
+  logPanel.scrollTop = logPanel.scrollHeight;
 }
 
 function renderActions(): void {
