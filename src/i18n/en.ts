@@ -78,5 +78,7 @@ export const en: Messages = {
     newGameButton: 'New game / map size',
     restAction: 'Rest',
     useItemAction: (itemLabel, count) => `Use ${itemLabel} (${count})`,
+    nodeInfo: (id, typeLabel) => `Selected: #${id} ${typeLabel}`,
+    notAdjacentHint: 'Not adjacent to your position. Tap a highlighted node to move.',
   },
 };

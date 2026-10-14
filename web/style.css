@@ -108,7 +108,8 @@ main {
 
 #map-container {
   flex: 1 1 auto;
-  min-width: 320px;
+  min-width: min(320px, 100%);
+  touch-action: manipulation;
   max-width: 720px;
   border: 1px solid #8888;
   border-radius: 4px;
@@ -214,6 +215,22 @@ main {
 .swatch.node-normal { background: #999; }
 .swatch.node-treasure { background: #d4af37; }
 
+#game-panel {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+#node-info {
+  white-space: pre-line;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.85;
+}
+
+#node-info:empty {
+  display: none;
+}
+
 #status-panel {
   white-space: pre-line;
   font-size: 0.9rem;
@@ -271,4 +288,81 @@ main {
 #banner.banner-lost {
   background: #c0392b33;
   color: #8e2c1f;
+}
+
+button,
+select {
+  touch-action: manipulation;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 0.75rem;
+  }
+
+  #start-screen {
+    min-height: calc(100vh - 1.5rem);
+    min-height: calc(100dvh - 1.5rem);
+  }
+
+  .start-card {
+    padding: 1.25rem;
+  }
+
+  header h1 {
+    font-size: 1.1rem;
+  }
+
+  .controls input {
+    flex: 1 1 6rem;
+    width: auto;
+    min-width: 0;
+  }
+
+  /* Grid rather than a column flexbox: in a flex column the map container's
+     height is resolved before the SVG's percentage width, so it sizes from the
+     SVG's default intrinsic height and the map overflows its border. */
+  main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  #map-container {
+    min-width: 0;
+    max-width: none;
+  }
+
+  .legend {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+  }
+}
+
+/* Touch devices: thicker node outlines and finger-sized controls. */
+@media (pointer: coarse) {
+  .node-current {
+    stroke-width: 0.9;
+  }
+
+  .node-reachable {
+    stroke-width: 0.8;
+  }
+
+  button,
+  select,
+  .controls input,
+  .start-field input[type='number'] {
+    min-height: 44px;
+    font-size: 1rem;
+  }
+
+  .actions button {
+    padding: 0.5rem 0.9rem;
+  }
+
+  .start-field input[type='range'] {
+    height: 44px;
+  }
 }

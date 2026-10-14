@@ -41,10 +41,15 @@ const banner = document.querySelector<HTMLDivElement>('#banner')!;
 const statusPanel = document.querySelector<HTMLDivElement>('#status-panel')!;
 const actionsPanel = document.querySelector<HTMLDivElement>('#actions-panel')!;
 const logPanel = document.querySelector<HTMLUListElement>('#log-panel')!;
+const nodeInfo = document.querySelector<HTMLDivElement>('#node-info')!;
 
 let map: GeneratedMap;
 let gameState: GameState;
 let nodeCount = 20;
+let selectedNodeId: number | undefined;
+// pointerType of the most recent pointerdown on the map, so a click can tell
+// touch/pen taps apart from mouse clicks (click events don't reliably carry it).
+let lastPointerType = 'mouse';
 let locale: Locale = resolveLocale(
   (() => {
     try {
@@ -116,6 +121,7 @@ function regenerate(seed?: number): void {
   history.replaceState(null, '', url);
 
   logPanel.replaceChildren();
+  selectedNodeId = undefined;
   banner.className = '';
   banner.textContent = '';
 
@@ -159,6 +165,24 @@ function renderGame(): void {
   }
 
   renderActions();
+  renderNodeInfo();
+}
+
+// Touch devices have no hover, so the SVG <title> tooltips never show; the
+// last tapped node's info is surfaced in a panel instead.
+function renderNodeInfo(): void {
+  const t = getMessages(locale);
+  const node = selectedNodeId !== undefined ? map.nodes.find((n) => n.id === selectedNodeId) : undefined;
+  if (!node) {
+    nodeInfo.textContent = '';
+    return;
+  }
+  const adjacent = getAdjacentNodeIds(map, gameState.currentNodeId).includes(node.id);
+  const lines = [t.web.nodeInfo(node.id, t.nodeType[node.type])];
+  if (gameState.status === 'ongoing' && node.id !== gameState.currentNodeId && !adjacent) {
+    lines.push(t.web.notAdjacentHint);
+  }
+  nodeInfo.textContent = lines.join('\n');
 }
 
 function runCommand(command: GameCommand): void {
@@ -226,14 +250,51 @@ langSelect.addEventListener('change', () => {
   if (!gameScreen.hidden) renderGame();
 });
 
+mapContainer.addEventListener('pointerdown', (event) => {
+  lastPointerType = event.pointerType || 'mouse';
+});
+
+// Rendered nodes are only a few px wide on a phone, so a tap resolves to the
+// nearest node within half the generator's min spacing (non-overlapping for
+// normally sampled points) rather than requiring a hit on the circle itself.
+function findNodeAt(clientX: number, clientY: number): number | undefined {
+  const svg = mapContainer.querySelector<SVGSVGElement>('svg');
+  const ctm = svg?.getScreenCTM();
+  if (!svg || !ctm) return undefined;
+  const pt = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
+  const x = pt.x;
+  const y = map.config.height - pt.y;
+  const maxDist = map.config.minDistance / 2;
+  let best: number | undefined;
+  let bestDist = Infinity;
+  for (const node of map.nodes) {
+    const d = Math.hypot(node.x - x, node.y - y);
+    if (d < bestDist) {
+      bestDist = d;
+      best = node.id;
+    }
+  }
+  return bestDist <= maxDist ? best : undefined;
+}
+
 mapContainer.addEventListener('click', (event) => {
   if (gameState.status !== 'ongoing') return;
 
   const target = (event.target as Element).closest('.node');
-  if (!target) return;
+  const directId = target ? Number(target.getAttribute('data-id')) : NaN;
+  const targetNodeId = Number.isInteger(directId) ? directId : findNodeAt(event.clientX, event.clientY);
+  if (targetNodeId === undefined) return;
 
-  const targetNodeId = Number(target.getAttribute('data-id'));
-  if (!Number.isInteger(targetNodeId)) return;
+  selectedNodeId = targetNodeId;
+
+  // On touch, a tap on a non-adjacent node only selects it (showing its info)
+  // instead of spending a turn on a blocked move — fat-finger protection.
+  // Mouse clicks keep the engine-validated behavior.
+  const isTouch = lastPointerType !== 'mouse';
+  if (isTouch && !getAdjacentNodeIds(map, gameState.currentNodeId).includes(targetNodeId)) {
+    renderNodeInfo();
+    return;
+  }
 
   runCommand({ type: 'move', targetNodeId });
 });

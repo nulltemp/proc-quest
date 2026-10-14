@@ -78,5 +78,7 @@ export const ja: Messages = {
     newGameButton: '新しいゲーム / マップサイズ',
     restAction: '休息',
     useItemAction: (itemLabel, count) => `${itemLabel}を使用 (${count})`,
+    nodeInfo: (id, typeLabel) => `選択中: #${id} ${typeLabel}`,
+    notAdjacentHint: '現在地に隣接していません。強調表示されたノードをタップすると移動します。',
   },
 };
