@@ -1,7 +1,7 @@
 export { createInitialState } from './state.js';
 export type { CreateGameOptions } from './state.js';
 export { advanceTurn } from './turn.js';
-export { canMoveTo, getAdjacentNodeIds } from './movement.js';
+export { canMoveTo, getAdjacentNodeIds, getShortestPath } from './movement.js';
 export { resolveSkirmish, resolveBossEncounter } from './combat.js';
 export type { BattleOutcome, BossEncounterOutcome } from './combat.js';
 export { resolveNodeArrival } from './nodeEffects.js';
@@ -33,3 +33,7 @@ export type {
   GameStatus,
   TurnEvent,
 } from './types.js';
+export { startSession, applyCommand, replayTurns } from './session.js';
+export type { GameSession } from './session.js';
+export { serializeSave, parseSave, SaveFormatError, SAVE_FORMAT_VERSION } from './save.js';
+export type { SaveData } from './save.js';

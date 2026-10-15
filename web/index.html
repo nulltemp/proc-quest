@@ -28,6 +28,10 @@
           <input id="start-seed-input" type="number" step="1" placeholder="random" />
         </div>
         <button id="start-btn" type="button">Start</button>
+        <button id="continue-btn" type="button" hidden></button>
+        <button id="import-btn" type="button" class="secondary">Load save file</button>
+        <input id="import-input" type="file" accept="application/json,.json" hidden />
+        <p id="start-error" class="start-error" role="alert"></p>
       </div>
     </section>
     <section id="game-screen" hidden>
@@ -39,6 +43,7 @@
           <button id="regenerate-btn" type="button">Regenerate</button>
           <button id="random-btn" type="button">Random seed</button>
           <button id="new-game-btn" type="button">New game / map size</button>
+          <button id="export-btn" type="button">Download save</button>
           <span id="seed-display"></span>
         </div>
       </header>

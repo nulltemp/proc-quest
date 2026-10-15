@@ -44,6 +44,10 @@ export interface Messages {
     victory: string;
     gameOver: string;
     gameEnded: string;
+    saved: (path: string) => string;
+    saveFailed: (error: string) => string;
+    loaded: (path: string, turn: number) => string;
+    loadFailed: (path: string, error: string) => string;
   };
   web: {
     title: string;
@@ -67,5 +71,10 @@ export interface Messages {
     useItemAction: (itemLabel: string, count: number) => string;
     nodeInfo: (id: number, typeLabel: string) => string;
     notAdjacentHint: string;
+    continueButton: (turn: number, seed: number) => string;
+    importSaveButton: string;
+    exportSaveButton: string;
+    importFailed: (error: string) => string;
+    resumedLog: (turn: number) => string;
   };
 }

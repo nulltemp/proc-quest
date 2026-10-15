@@ -51,12 +51,16 @@ export const en: Messages = {
   cli: {
     reproduce: (seed) => `Reproduce with: node dist/index.js ${seed}`,
     gameStart:
-      '--- Game start (type a node id to move, "rest" to recover power, "use <item>" to use an item, or "quit" to exit) ---',
+      '--- Game start (type a node id to move, "rest" to recover power, "use <item>" to use an item, "save [file]" to save, or "quit" to exit) ---',
     noMoves: 'No moves available. Ending game.',
-    invalidCommand: 'Please enter a node id, "rest", or "use <item>".',
+    invalidCommand: 'Please enter a node id, "rest", "use <item>", or "save [file]".',
     victory: 'You defeated the enemy boss! Victory!',
     gameOver: 'Your faction has been depleted. Game over.',
     gameEnded: 'Game ended.',
+    saved: (path) => `Saved to ${path}. Resume with: node dist/index.js --load=${path}`,
+    saveFailed: (error) => `Could not save: ${error}`,
+    loaded: (path, turn) => `Loaded ${path} (turn ${turn}).`,
+    loadFailed: (path, error) => `Could not load ${path}: ${error}`,
   },
   web: {
     title: 'proc-quest map viewer',
@@ -80,5 +84,10 @@ export const en: Messages = {
     useItemAction: (itemLabel, count) => `Use ${itemLabel} (${count})`,
     nodeInfo: (id, typeLabel) => `Selected: #${id} ${typeLabel}`,
     notAdjacentHint: 'Not adjacent to your position. Tap a highlighted node to move.',
+    continueButton: (turn, seed) => `Continue (turn ${turn}, seed ${seed})`,
+    importSaveButton: 'Load save file',
+    exportSaveButton: 'Download save',
+    importFailed: (error) => `Could not load the save file: ${error}`,
+    resumedLog: (turn) => `Resumed saved game at turn ${turn}.`,
   },
 };

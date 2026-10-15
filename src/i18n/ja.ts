@@ -51,12 +51,16 @@ export const ja: Messages = {
   cli: {
     reproduce: (seed) => `再現するには: node dist/index.js ${seed}`,
     gameStart:
-      '--- ゲーム開始（ノードIDを入力して移動、"rest"で戦力回復、"use <item>"でアイテム使用、"quit"で終了） ---',
+      '--- ゲーム開始（ノードIDを入力して移動、"rest"で戦力回復、"use <item>"でアイテム使用、"save [ファイル]"でセーブ、"quit"で終了） ---',
     noMoves: '移動できるノードがありません。ゲームを終了します。',
-    invalidCommand: 'ノードID、"rest"、または"use <item>"を入力してください。',
+    invalidCommand: 'ノードID、"rest"、"use <item>"、または"save [ファイル]"を入力してください。',
     victory: '敵のボスを倒しました！ 勝利！',
     gameOver: '自軍の戦力が尽きました。ゲームオーバー。',
     gameEnded: 'ゲーム終了。',
+    saved: (path) => `${path} にセーブしました。再開するには: node dist/index.js --load=${path}`,
+    saveFailed: (error) => `セーブできませんでした: ${error}`,
+    loaded: (path, turn) => `${path} をロードしました（ターン${turn}）。`,
+    loadFailed: (path, error) => `${path} をロードできませんでした: ${error}`,
   },
   web: {
     title: 'proc-quest マップビューア',
@@ -80,5 +84,10 @@ export const ja: Messages = {
     useItemAction: (itemLabel, count) => `${itemLabel}を使用 (${count})`,
     nodeInfo: (id, typeLabel) => `選択中: #${id} ${typeLabel}`,
     notAdjacentHint: '現在地に隣接していません。強調表示されたノードをタップすると移動します。',
+    continueButton: (turn, seed) => `続きから（ターン${turn}、シード${seed}）`,
+    importSaveButton: 'セーブファイルを読み込む',
+    exportSaveButton: 'セーブをダウンロード',
+    importFailed: (error) => `セーブファイルを読み込めませんでした: ${error}`,
+    resumedLog: (turn) => `ターン${turn}のセーブデータから再開しました。`,
   },
 };
