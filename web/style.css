@@ -70,11 +70,27 @@ body {
   padding: 0.4rem;
 }
 
-#start-btn {
+#start-btn,
+#continue-btn {
   padding: 0.6rem 1rem;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+}
+
+#import-btn {
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+}
+
+.start-error {
+  margin: 0;
+  color: #c0392b;
+  font-size: 0.9rem;
+}
+
+.start-error:empty {
+  display: none;
 }
 
 header h1 {

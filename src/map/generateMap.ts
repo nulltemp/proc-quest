@@ -227,3 +227,14 @@ export function generateMap(options: MapConfig = {}): GeneratedMap {
 
   return { nodes, edges, startNodeId, bossNodeId, config };
 }
+
+/**
+ * Map config for a given node count with the play area scaled by
+ * sqrt(nodeCount / default nodeCount), so node density (and therefore
+ * min-spacing feasibility for rejection sampling) stays roughly constant
+ * whether the map is small or large.
+ */
+export function sizedMapConfig(nodeCount: number): MapConfig {
+  const side = Math.round(DEFAULT_CONFIG.width * Math.sqrt(nodeCount / DEFAULT_CONFIG.nodeCount));
+  return { nodeCount, width: side, height: side };
+}
